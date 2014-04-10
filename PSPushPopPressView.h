@@ -14,74 +14,91 @@
 @protocol PSPushPopPressViewDelegate <NSObject>
 @optional
 
-/// manipulation starts, user has >= 2 fingers on the view
+/// Manipulation has started.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+/// @discussion The user has two or more fingers on the view.
 - (void)pushPopPressViewDidStartManipulation:(PSPushPopPressView *)pushPopPressView;
 
-/// manipulation stopps, user has < 2 fingers on the view
+///	Manipulation has sopped.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+/// @discussion The user has less than two fingers on the view.
 - (void)pushPopPressViewDidFinishManipulation:(PSPushPopPressView *)pushPopPressView;
 
-/// view will animate back to original frame
-- (void)pushPopPressViewWillAnimateToOriginalFrame:(PSPushPopPressView *)pushPopPressView duration: (NSTimeInterval)duration;
+///	The view will animate back to its original frame.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+///	@param duration The duration of the animation.
+- (void)pushPopPressViewWillAnimateToOriginalFrame:(PSPushPopPressView *)pushPopPressView
+										  duration:(NSTimeInterval)duration;
 
-/// animation to original frame is finished
+///	The animation back to the receiver's original frame has completed.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
 - (void)pushPopPressViewDidAnimateToOriginalFrame:(PSPushPopPressView *)pushPopPressView;
 
-- (void)pushPopPressViewWillAnimateToFullscreenWindowFrame:(PSPushPopPressView *)pushPopPressView duration: (NSTimeInterval)duration;
+///	The view will animate to fullscreen mode.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+///	@param duration The duration of the animation.
+- (void)pushPopPressViewWillAnimateToFullscreenWindowFrame:(PSPushPopPressView *)pushPopPressView
+												  duration:(NSTimeInterval)duration;
+
+///	The view did animate to fullscreen mode.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
 - (void)pushPopPressViewDidAnimateToFullscreenWindowFrame:(PSPushPopPressView *)pushPopPressView;
 
+///	Whether or not the view should allow tapping to animate to the original frame.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+///	@return Whether or not the view should animate back to the original frame due to a tap.
 - (BOOL)pushPopPressViewShouldAllowTapToAnimateToOriginalFrame:(PSPushPopPressView *)pushPopPressView;
+
+///	Whether or not the view should allow tapping to animate to fullscreen.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+///	@return Whether or not the view should animate to fullscreen due to a tap.
 - (BOOL)pushPopPressViewShouldAllowTapToAnimateToFullscreenWindowFrame:(PSPushPopPressView *)pushPopPressView;
 
-/// only active if allowSingleTapSwitch is enabled (default)
+///	The view received a tap.
+///	@param pushPopPressView The instance of @c PSPushPopPressView.
+/// @discussion This is only called when @c allowSingleTapSwitch is @c YES.
 - (void)pushPopPressViewDidReceiveTap:(PSPushPopPressView *)pushPopPressView;
 
 @end
 
-@interface PSPushPopPressView : UIView <UIGestureRecognizerDelegate> {
-    UITapGestureRecognizer* tapRecognizer_;
-    UILongPressGestureRecognizer* doubleTouchRecognizer;
-    UIPanGestureRecognizer* panRecognizer_;
-    CGAffineTransform scaleTransform_;
-    CGAffineTransform rotateTransform_;
-    CGAffineTransform panTransform_;
-    CGRect initialFrame_;
-	NSInteger initialIndex_;
-    BOOL allowSingleTapSwitch_;
-    BOOL fullscreen_;
-    BOOL ignoreStatusBar_;
-	BOOL keepShadow_;
-    BOOL fullscreenAnimationActive_;
-    BOOL anchorPointUpdated;
-}
 
-/// the delegate for the PushPopPressView
+@interface PSPushPopPressView : UIView <UIGestureRecognizerDelegate>
+
+/// The delegate for the @c PushPopPressView.
 @property (nonatomic, unsafe_unretained) id<PSPushPopPressViewDelegate> pushPopPressViewDelegate;
 
-/// returns true if fullscreen is enabled
-@property (nonatomic, readonly, getter=isFullscreen) BOOL fullscreen;
-
-/// true if one or more fingers are on the view
+/// Determine if the receiver is currently being dragged/
+/// @c YES if one or more fingers are on the view.
 @property (nonatomic, readonly, getter=isBeingDragged) BOOL beingDragged;
 
-/// set initialFrame if you change frame after initWithFrame
+/// Determine if the receiver is currently being displayed fullscreen.
+@property (nonatomic, readonly, getter=isFullscreen) BOOL fullscreen;
+
+/// The frame of the view when displayed normally.
+/// @discussion set @c initialFrame if changing @c frame after calling @c initWithFrame:
 @property (nonatomic, assign) CGRect initialFrame;
 
-/// allow mode switching via single tap. Defaults to YES.
+/// Allow switching between normal and fullscreen with a single tap. Default: @c YES.
 @property (nonatomic, assign) BOOL allowSingleTapSwitch;
 
-/// if true, [UIScreen mainScreen] is used for coordinates (vs rootView)
+/// Ignore the status bar for orientation.
+/// If @c YES, @c [UIScreen mainScreen] is used for coordinates instead of @c rootView.
 @property (nonatomic, assign) BOOL ignoreStatusBar;
 
-/// if true, shadow does not appear/disappear when animating
-@property (nonatomic, assign) BOOL keepShadow;
+///	Show a shadow below the view. Default: @c YES.
+@property (nonatomic, assign) BOOL showShadow;
 
-/// animate/move to fullscreen
+///	Move the view to fullscreen mode.
+///	@param animated Whether or not this change should be animated.
 - (void)moveToFullscreenWindowAnimated:(BOOL)animated;
 
-/// animate/moves to initialFrame size
+///	Move the view to the original, normal mode.
+///	@param animated Whether nor not this change should be animated.
 - (void)moveToOriginalFrameAnimated:(BOOL)animated;
 
-/// align view based on current size (either initialPosition or fullscreen)
+///	Align the view based on the current size.
+///	@param animated Whether or not this change should be animated.
+///	@param bounces Whether or not this animation should bounce.
 - (void)alignViewAnimated:(BOOL)animated bounces:(BOOL)bounces;
 
 @end
